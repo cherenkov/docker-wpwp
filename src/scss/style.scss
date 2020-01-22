@@ -1,0 +1,66 @@
+@charset "utf-8";
+/*!
+Theme Name: my wordpress
+Description: my wordpress
+Version: 1.0
+Author: @Yuking11
+Author URI: https://yuking11.net/
+*/
+
+/*
+ * WordPress Native CSS
+ */
+/* for Images */
+img[class*="wp-image-"],
+img[class*="attachment-"] {
+  max-width: 100%;
+  height: auto;
+}
+@media screen and (min-width: 768px) {
+  .aligncenter {
+    display: block;
+    margin: 0 auto .8em;
+  }
+  .alignleft {
+    float: left;
+    margin: 0 .8em .8em 0;
+  }
+  .alignright {
+    float: right;
+    margin: 0 0 .8em .8em;
+  }
+}
+
+/*
+ * Set Print CSS
+ */
+@media print {
+  section {
+    display: block;
+    // page-break-before: auto;
+  }
+  pre code {
+    page-break-after: auto;
+  }
+  @page {
+    margin-top: .4cm;
+    margin: .5cm;
+  }
+  p a, code, pre {
+    word-wrap: break-word;
+  }
+  pre a[href]:after {
+    content: "";
+  }
+  pre abbr[title]:after {
+    content: "";
+  }
+  pre.ir a:after,
+  pre a[href^="javascript:"]:after,
+  pre a[href^="#"]:after {
+    content: "";
+  }
+  .no_print {
+    display:none;
+  }
+}

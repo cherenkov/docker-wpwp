@@ -1,0 +1,11 @@
+.DS_Store
+
+# dotenv environment variables file
+.env
+!.env.template
+
+# eslint
+!.eslintrc.js
+
+*db_data/
+*phpmyadmin/

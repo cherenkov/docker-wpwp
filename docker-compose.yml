@@ -1,0 +1,63 @@
+version: "3"
+services:
+  db:
+    image: mysql:5.7
+    container_name: ${PROJECT_NAME}-db
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    # mysql > 8 の場合は以下
+    # command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+    env_file: .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/db_data:/var/lib/mysql
+      - ./docker/mysql/localhost.sql:/docker-entrypoint-initdb.d/wordpress.sql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+
+  wordpress:
+    image: wordpress:latest
+    container_name: ${PROJECT_NAME}-wp
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - "8000:80"
+    volumes:
+      - ./app/themes/${THEME_NAME}:/var/www/html/wp-content/themes/${THEME_NAME}
+      - ./app/plugins:/var/www/html/wp-content/plugins
+      - ./app/uploads:/var/www/html/wp-content/uploads
+      - ./app/languages:/var/www/html/wp-content/languages
+      - ./docker/wordpress/php.ini /usr/local/etc/php/conf.d/php.ini
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ${PROJECT_NAME}-phpmyadmin
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - 3002:80
+    volumes:
+      - ./docker/phpmyadmin/sessions:/sessions
+
+  bs:
+    image: ustwo/browser-sync
+    container_name: ${PROJECT_NAME}-bs
+    command: start --proxy "wordpress:80" --files "app/themes/${THEME_NAME}/**/*.php,app/themes/${THEME_NAME}/**/*.css,app/themes/${THEME_NAME}/**/*.js"
+    depends_on:
+      - wordpress
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ./app/themes/${THEME_NAME}:/source/app/themes/${THEME_NAME}
+
+  webpack:
+    build: ./docker/webpack
+    container_name: ${PROJECT_NAME}-webpack
+    volumes:
+      - ./src:/webpack/src
+      - ./app/themes/${THEME_NAME}:/webpack/app/themes/${THEME_NAME}
+      - ./docker/webpack/package.json:/webpack/package.json
+      - ./docker/webpack/webpack.config.js:/webpack/webpack.config.js
+      - ./docker/webpack/.eslintrc.js:/webpack/.eslintrc.js
